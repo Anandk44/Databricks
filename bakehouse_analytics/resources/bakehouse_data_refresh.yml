@@ -9,7 +9,7 @@ resources:
         # Run this job every day, exactly one day from the last run; see https://docs.databricks.com/api/workspace/jobs/create#trigger
         periodic:
           interval: 1
-          unit: DAYS
+          unit: MONTH
 
       #email_notifications:
       #  on_failure:
@@ -22,11 +22,21 @@ resources:
           default: ${var.schema}
 
       tasks:
-        - task_key: notebook_task
+        - task_key: customer_360
           notebook_task:
             notebook_path: ../src/customer_360.ipynb
+        - task_key: transaction_notebook
+          depends_on:
+            - task_key: customer_360
+          notebook_task:
+            notebook_path: ../src/transactions_summary.ipynb
+    
 
       environments:
         - environment_key: default
           spec:
             environment_version: "5"
+      git_source:
+        git_branch: main
+        git_provider: gitHub
+        git_url: https://github.com/Anandk44/Databricks.git
